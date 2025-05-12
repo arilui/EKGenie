@@ -1,4 +1,4 @@
-# Capstone
+# EKGenie
 
 ## Project Overview
 This project consists of multiple components for analyzing and visualizing EKG data. Below is a summary of the files included in this repository:
