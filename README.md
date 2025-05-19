@@ -5,39 +5,35 @@ This project consists of multiple components for analyzing, visualizing, and cla
 
 ### Files
 
-1. **HawraaJupyter.ipynb**
-   - Jupyter Notebook for data analysis and visualization of heartbeat datasets.
-   - Tasks: loading data, PCA, correlation matrices, class distribution, and visualizations.
-
-2. **DataVisualization.ipynb**
+1. **DataVisualization.ipynb**
    - Notebook for visualizing EKG/ECG signals and class distributions.
    - Includes waveform plots, class-based heatmaps, and boxplots for feature exploration.
 
-3. **FeatureEngineering.ipynb**
+2. **FeatureEngineering.ipynb**
    - Notebook for feature engineering and cleaning on the MIT-BIH dataset.
    - Drops columns with mostly zero values, visualizes zero density, and prepares data for modeling.
 
-4. **CNN.ipynb**
+3. **CNN.ipynb**
    - Deep learning notebook for classifying heartbeats using a 1D Convolutional Neural Network (CNN).
    - Loads processed data from FeatureEngineering, applies normalization, builds and trains a CNN, and evaluates with confusion matrix and ROC/AUC.
 
-5. **RNN.ipynb**
+4. **RNN.ipynb**
    - Notebook for classifying heartbeats using a Recurrent Neural Network (RNN) architecture.
    - Similar workflow to CNN.ipynb but with RNN/LSTM layers.
 
-6. **CleanData.ipynb**
+5. **CleanData.ipynb**
    - Notebook for initial data cleaning and preprocessing.
    - Handles missing values, outlier removal, and basic exploratory analysis.
 
-7. **naiveBayes.ipynb**
+6. **naiveBayes.ipynb**
    - Implements a Naive Bayes classifier for heartbeat classification.
    - Compares performance with deep learning models.
 
-8. **Arduino.cpp**
+7. **Arduino.cpp**
    - Arduino code for reading EKG sensor data and transmitting it via serial communication.
    - Configured for a sampling rate of approximately 100Hz.
 
-9. **Window.py**
+8. **Window.py**
    - Python GUI application built with Tkinter for recording and visualizing EKG data in real-time.
    - Features: serial port connection, data recording, live plotting, and CSV export.
 
