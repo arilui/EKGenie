@@ -1,27 +1,47 @@
 # EKGenie
 
 ## Project Overview
-This project consists of multiple components for analyzing and visualizing EKG data. Below is a summary of the files included in this repository:
+This project consists of multiple components for analyzing, visualizing, and classifying EKG data. Below is a summary of the files included in this repository:
 
 ### Files
 
-1. **HawraaJupyter.ipynb**
-   - A Jupyter Notebook for data analysis and visualization of heartbeat datasets.
-   - Includes tasks such as loading data, performing PCA, calculating correlation matrices, and visualizing results.
+1. **DataVisualization.ipynb**
+   - Notebook for visualizing EKG/ECG signals and class distributions.
+   - Includes waveform plots, class-based heatmaps, and boxplots for feature exploration.
 
-2. **Arduino.cpp**
+2. **FeatureEngineering.ipynb**
+   - Notebook for feature engineering and cleaning on the MIT-BIH dataset.
+   - Drops columns with mostly zero values, visualizes zero density, and prepares data for modeling.
+
+3. **CNN.ipynb**
+   - Deep learning notebook for classifying heartbeats using a 1D Convolutional Neural Network (CNN).
+   - Loads processed data from FeatureEngineering, applies normalization, builds and trains a CNN, and evaluates with confusion matrix and ROC/AUC.
+
+4. **RNN.ipynb**
+   - Notebook for classifying heartbeats using a Recurrent Neural Network (RNN) architecture.
+   - Similar workflow to CNN.ipynb but with RNN/LSTM layers.
+
+5. **CleanData.ipynb**
+   - Notebook for initial data cleaning and preprocessing.
+   - Handles missing values, outlier removal, and basic exploratory analysis.
+
+6. **naiveBayes.ipynb**
+   - Implements a Naive Bayes classifier for heartbeat classification.
+   - Compares performance with deep learning models.
+
+7. **Arduino.cpp**
    - Arduino code for reading EKG sensor data and transmitting it via serial communication.
    - Configured for a sampling rate of approximately 100Hz.
 
-3. **Window.py**
-   - A Python GUI application built with Tkinter for recording and visualizing EKG data in real-time.
-   - Features include serial port connection, data recording, and live plotting.
+8. **Window.py**
+   - Python GUI application built with Tkinter for recording and visualizing EKG data in real-time.
+   - Features: serial port connection, data recording, live plotting, and CSV export.
 
 ## How to Use
 
-### Jupyter Notebook
-- Open `HawraaJupyter.ipynb` in Jupyter Notebook or VS Code.
-- Follow the cells sequentially to load data, preprocess, and analyze it.
+### Jupyter Notebooks
+- Open any notebook (e.g. `DataVisualization.ipynb`, `FeatureEngineering.ipynb`, `CNN.ipynb`) in Jupyter Notebook or VS Code.
+- Follow the cells sequentially to load, preprocess, analyze, and model the data.
 
 ### Arduino Code
 - Upload `Arduino.cpp` to an Arduino board connected to an EKG sensor.
@@ -33,8 +53,9 @@ This project consists of multiple components for analyzing and visualizing EKG d
 
 ## Requirements
 - Python 3.x
-- Libraries: `pandas`, `matplotlib`, `seaborn`, `numpy`, `serial`, `tkinter`
-- Arduino IDE for uploading the Arduino code.
+- Libraries: `pandas`, `matplotlib`, `seaborn`, `numpy`, `scikit-learn`, `tensorflow`, `serial`, `tkinter`, `kagglehub`
+- Jupyter Notebook or VS Code for running notebooks
+- Arduino IDE for uploading the Arduino code
 
 ## License
 This project is licensed under the MIT License.
