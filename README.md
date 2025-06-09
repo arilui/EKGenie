@@ -53,12 +53,14 @@ This project consists of multiple components for analyzing, visualizing, and cla
 14. **ML_Test.ipynb**
     - Miscellaneous machine learning experiments and tests.
 
+15. **cnn_attention.ipynb**
+    - CNN model with attention mechanism for heartbeat classification.
 
-15. **Arduino.cpp**
+16. **Arduino.cpp**
     - Arduino code for reading EKG sensor data and transmitting it via serial communication.
     - Configured for a sampling rate of approximately 100Hz.
 
-16. **Window.py**
+17. **Window.py**
     - Python GUI application built with Tkinter for recording and visualizing EKG data in real-time.
     - Features: serial port connection, data recording, live plotting, and CSV export.
 
