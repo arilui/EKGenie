@@ -7,7 +7,6 @@ import time
 import csv
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
-import numpy as np
 
 class EKGRecorderApp:
     def __init__(self, root):
