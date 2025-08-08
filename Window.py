@@ -11,6 +11,7 @@ from tensorflow import keras
 from CNN import FocalLoss
 from sklearn.preprocessing import StandardScaler
 from collections import Counter
+from scipy.signal import butter, filtfilt, find_peaks
 
 custom_objects = {'FocalLoss': FocalLoss}
 cnn = keras.models.load_model('cnn_model.keras', custom_objects=custom_objects)
@@ -59,7 +60,7 @@ class EKGRecorderApp:
         ttk.Label(control_frame, text="Baud Rate:").grid(row=0, column=1, sticky=tk.W)
         self.baud_combobox = ttk.Combobox(control_frame, values=[9600, 19200, 38400, 57600, 115200], state="readonly")
         self.baud_combobox.grid(row=0, column=2, padx=5)
-        self.baud_combobox.set(115200)  # Default baud rate
+        self.baud_combobox.set(9600)  # Default baud rate
         
         # Connect button
         self.connect_button = ttk.Button(control_frame, text="Connect", command=self.toggle_connection)
@@ -105,8 +106,12 @@ class EKGRecorderApp:
     def setup_plot(self):
         """Initialize the plot with empty data"""
         self.line, = self.ax.plot([], [], 'b-')
-        self.ax.set_xlim(0, 10)  # Initial x-axis limit (10 seconds)
-        self.ax.set_ylim(200, 800)  # Fixed y-axis range (0-1000 mV)
+        self.ax.set_xlim(0, 500)  # Show last 500 samples (adjust as needed)
+        self.ax.set_ylim(300, 500)  # Fixed y-axis range
+        self.ax.set_xlabel("Sample Index")  # Changed from Time (s)
+        self.ax.set_ylabel("Voltage (mV)")
+        self.ax.set_title("EKG Signal")
+        self.ax.grid(True)
             
     def toggle_connection(self):
         """Connect or disconnect from the serial port"""
@@ -150,12 +155,16 @@ class EKGRecorderApp:
         self.hr_var.set("Heart Rate: -- BPM")
     
     def analyze_ekg_data(self):
-        """Analyze the recorded EKG data using the Random Forest model"""
+        """Analyze the recorded EKG data using the CNN"""
         if len(self.voltage_data) == 0:
             messagebox.showwarning("No Data", "No EKG data to analyze!")
             return
             
         try:
+            print("Length of voltage data:", len(self.voltage_data))
+            print(len(self.voltage_data)/(self.time_data[-1]-self.time_data[0]), "samples per second")
+
+
             # Group the voltage data into segments of 133 samples
             segment_length = 133
             num_segments = len(self.voltage_data) // segment_length
@@ -172,6 +181,7 @@ class EKGRecorderApp:
             # Normalize each segment
             scaler = StandardScaler()
             data = scaler.fit_transform(data.reshape(-1, segment_length)).reshape(num_segments, segment_length, 1)
+
 
             diagnosis = cnn.predict(data)
             predictions = np.argmax(diagnosis, axis=1)
@@ -207,7 +217,7 @@ class EKGRecorderApp:
             self.record_button.config(text="Start Recording")
             self.export_button.config(state=tk.NORMAL)
             self.clear_button.config(state=tk.NORMAL)
-            self.status_var.set(f"Recording stopped - {len(self.time_data)} samples collected")
+            self.status_var.set(f"Recording stopped - {len(self.time_data)} samples collected\nTime elapsed: {time.time() - self.start_time:.2f} seconds")
             
             # Analyze the recorded data
             self.analyze_ekg_data()
@@ -223,7 +233,7 @@ class EKGRecorderApp:
             self.status_var.set("Recording...")
             self.hr_var.set("Heart Rate: -- BPM")
             
-    def find_r_peaks(self, threshold=400, min_distance=0.2):
+    def find_r_peaks(self, threshold=400, min_distance=0.1):
         """Detect R-peaks in the EKG data"""
         peaks = []
         if len(self.voltage_data) < 3:
@@ -245,8 +255,10 @@ class EKGRecorderApp:
         if len(peaks) < 2:
             return 0
         
+        peaks = np.array(peaks)
+        
         # Calculate RR intervals in seconds
-        rr_intervals = np.diff([peak[0] for peak in peaks])
+        rr_intervals = np.diff(peaks[:, 0])
         
         # Calculate average RR interval
         avg_rr = np.mean(rr_intervals)
@@ -290,19 +302,16 @@ class EKGRecorderApp:
         if len(self.time_data) == 0 or len(self.voltage_data) == 0:
             return
             
-        self.line.set_data(self.time_data, self.voltage_data)
+        sample_indices = np.arange(len(self.voltage_data))
+        self.line.set_data(sample_indices, self.voltage_data)
         
-        # Detect R-peaks (using 500 mV threshold)
+        # Detect R-peaks (using 400 mV threshold)
         peaks = self.find_r_peaks(threshold=400)
         
         # Clear previous peak markers
         for artist in self.ax.lines[1:]:
             artist.remove()
-        
-        # Mark peaks on plot
-        if peaks:
-            peak_times, peak_values = zip(*peaks)
-            self.ax.plot(peak_times, peak_values, 'ro', markersize=5)
+
         
         # Calculate and display heart rate
         heart_rate = self.calculate_heart_rate(peaks)
@@ -319,14 +328,14 @@ class EKGRecorderApp:
             self.hr_var.set("Heart Rate: -- BPM")
         
         # Adjust x-axis limits to show the most recent 10 seconds
-        current_time = self.time_data[-1] if len(self.time_data) > 0 else 0
-        if current_time > 10:
-            self.ax.set_xlim(current_time - 10, current_time)
+        
+        if len(sample_indices) > 450:
+            self.ax.set_xlim(len(sample_indices) - 450, len(sample_indices))
         else:
-            self.ax.set_xlim(0, 10)
+            self.ax.set_xlim(0, 450)
         
         # Maintain fixed y-axis range (0-1000 mV)
-        self.ax.set_ylim(0, 1000)
+        self.ax.set_ylim(300, 450)
         
         # Redraw the canvas
         self.canvas.draw()
@@ -381,7 +390,7 @@ class EKGRecorderApp:
         self.voltage_data = np.array([], dtype=np.float32)
         self.line.set_data([], [])
         self.ax.set_xlim(0, 10)
-        self.ax.set_ylim(0, 1000)
+        self.ax.set_ylim(300, 450)
         
         # Clear peak markers and heart rate text
         for artist in self.ax.lines[1:]:
